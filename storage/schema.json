@@ -5,11 +5,13 @@
       {"name":"id","type":"string"}, {"name":"title","type":"string"},
       {"name":"description","type":"string"}, {"name":"wallet_id","type":"string"},
       {"name":"amount_sats","type":"integer"}, {"name":"status","type":"string"},
+      {"name":"option_ids","type":"string","list":true},
       {"name":"created_at","type":"datetime"}, {"name":"updated_at","type":"datetime"}
     ]},
     "poll_options": {"fields": [
       {"name":"id","type":"string"}, {"name":"poll_id","type":"string"},
-      {"name":"label","type":"string"}, {"name":"position","type":"integer"}
+      {"name":"label","type":"string"}, {"name":"position","type":"integer"},
+      {"name":"count","type":"integer"}
     ]},
     "votes": {"fields": [
       {"name":"id","type":"string"}, {"name":"poll_id","type":"string"},

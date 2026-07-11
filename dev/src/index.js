@@ -8,23 +8,27 @@ export function createPoll(requestJson) {
   return runJson(() => {
     const request = parseObject(requestJson)
     const labels = validateOptions(request.options)
+    const pollId = system.id('poll')
+    const optionIds = labels.map((_, position) => `${pollId}_option_${position}`)
     const poll = {
-      id: system.id('poll'),
+      id: pollId,
       title: requiredText(request.title, 'title', 100),
       description: cleanText(request.description, 500),
       wallet_id: requiredText(request.walletId, 'walletId', 128),
       amount_sats: positiveInteger(request.amountSats, 'amountSats'),
       status: 'open',
+      option_ids: optionIds,
       created_at: system.now(),
       updated_at: system.now()
     }
     storage.set(POLLS, poll)
     labels.forEach((label, position) =>
       storage.set(OPTIONS, {
-        id: system.id('option'),
+        id: optionIds[position],
         poll_id: poll.id,
         label,
-        position
+        position,
+        count: 0
       })
     )
     return pollDetail(poll)
@@ -129,6 +133,8 @@ export function recordVote(eventJson) {
       paid_at: eventTimestamp(event)
     }
     storage.set(VOTES, vote)
+    // ponytail: public reads cannot aggregate; votes remain authoritative if atomic counters become available.
+    storage.set(OPTIONS, {...option, count: Number(option.count || 0) + 1})
     return {recorded: true, voteId: vote.id}
   })
 }
@@ -148,8 +154,22 @@ function pollSummary(poll) {
 function publicPoll(pollId) {
   const poll = storage.getPublic(POLLS, pollId)
   if (!poll) throw new Error('Poll not found.')
-  // Public aggregate reads are expected from the WASM runtime contract.
-  return result(poll, rows(OPTIONS, {poll_id: pollId}), rows(VOTES, {poll_id: pollId}))
+  const options = (poll.option_ids || [])
+    .map(optionId => storage.getPublic(OPTIONS, optionId))
+    .filter(option => option && option.poll_id === pollId)
+  const totalVotes = options.reduce((total, option) => total + Number(option.count || 0), 0)
+  return {
+    ...publicFields(poll),
+    totalVotes,
+    options: options.map(option => ({
+      id: option.id,
+      pollId: option.poll_id,
+      label: option.label,
+      position: option.position,
+      count: Number(option.count || 0),
+      percentage: totalVotes ? (Number(option.count || 0) / totalVotes) * 100 : 0
+    }))
+  }
 }
 
 function result(poll, options, votes) {

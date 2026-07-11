@@ -15,8 +15,8 @@ async function moduleWithHost() {
       const row = this.get(table, id)
       if (!row) return null
       const fields = table === 'polls'
-        ? ['id', 'title', 'description', 'amount_sats', 'status']
-        : ['id', 'poll_id', 'label', 'position']
+        ? ['id', 'title', 'description', 'amount_sats', 'status', 'option_ids']
+        : ['id', 'poll_id', 'label', 'position', 'count']
       return Object.fromEntries(fields.map(field => [field, row[field]]))
     },
     getPaginated(table, {filters = {}, limit = 1000} = {}) {

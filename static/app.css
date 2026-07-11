@@ -1,11 +1,37 @@
 :root { color-scheme: dark; }
-[v-cloak], [hidden] { display: none !important; }
-body { margin: 0; min-height: 100vh; }
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100vh; background: var(--q-dark-page); color: white; letter-spacing: 0; }
+[hidden] { display: none !important; }
 .shell { width: min(1080px, 100%); margin: 0 auto; }
-.app-icon { width: 42px; height: 42px; }
-.dialog-card { width: min(560px, 92vw); max-height: 90vh; overflow: auto; }
-.invoice-card { position: relative; width: min(360px, 100%); border-radius: 6px; }
-.invoice-qr { position: relative; display: grid; place-items: center; width: 100%; padding: 12px; border: 0; background: white; border-radius: 4px; cursor: pointer; }
-.invoice-qr svg { width: min(280px, 100%); height: auto; }
-.invoice-qr img { position: absolute; width: 46px; height: 46px; border: 5px solid white; border-radius: 6px; }
-@media (max-width: 600px) { .shell { padding: 16px; } .q-table__middle { overflow-x: auto; } }
+.app-icon { width: 42px; height: 42px; border-radius: 6px; }
+.panel { border: 1px solid rgba(255, 255, 255, 0.18); }
+.form { display: grid; }
+.form label { display: grid; gap: 6px; }
+.form input, .form select, .form textarea {
+  width: 100%; min-height: 40px; padding: 8px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.24); border-radius: 4px;
+  background: rgba(255, 255, 255, 0.08); color: white; font: inherit;
+}
+.form textarea { min-height: 84px; resize: vertical; }
+.form input:focus, .form select:focus, .form textarea:focus { border-color: var(--q-primary); outline: none; }
+button.q-btn { min-height: 40px; border: 0; border-radius: 4px; cursor: pointer; font: inherit; padding: 8px 16px; }
+button:disabled { cursor: not-allowed; opacity: 0.6; }
+.icon-button { border: 0; background: transparent; color: inherit; cursor: pointer; }
+.modal-card { width: min(560px, calc(100vw - 32px)); max-height: 90vh; overflow: auto; }
+dialog::backdrop { background: rgba(0, 0, 0, 0.66); }
+.poll-row { padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
+.poll-row:last-child { border-bottom: 0; }
+.poll-options { display: grid; gap: 10px; }
+.public-option { display: grid; gap: 10px; padding: 12px; border: 1px solid rgba(255, 255, 255, 0.18); border-radius: 4px; }
+.option-result { margin-left: auto; }
+.result-track { height: 8px; overflow: hidden; border-radius: 4px; background: rgba(255, 255, 255, 0.12); }
+.result-fill { display: block; height: 100%; background: var(--q-primary); }
+.invoice-dialog-card { width: min(420px, calc(100vw - 32px)); }
+.invoice-qrcode { display: grid; min-height: 300px; place-items: center; padding: 10px; border-radius: 4px; background: white; }
+.invoice-qrcode svg { display: block; width: min(100%, 280px); height: auto; }
+.invoice-status { margin: 14px 0; text-align: center; }
+.invoice-copy-button { width: 100%; background: rgba(255, 255, 255, 0.08); }
+.button-spinner { display: none; width: 18px; height: 18px; margin-right: 8px; border: 2px solid rgba(255,255,255,.38); border-top-color: white; border-radius: 50%; animation: spin .75s linear infinite; vertical-align: -4px; }
+button[aria-busy='true'] .button-spinner { display: inline-block; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 600px) { .shell { padding: 16px; } }

@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "description": "Expose option references and paid counts to public poll pages.",
+  "operations": [
+    {"op":"add_field","table":"polls","field":"option_ids","type":"string","list":true,"default":[]},
+    {"op":"add_field","table":"poll_options","field":"count","type":"integer","default":0}
+  ]
+}

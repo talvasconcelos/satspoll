@@ -9,9 +9,54 @@
     <link rel="stylesheet" href="/ext-assets/satspoll/app.css" />
   </head>
   <body data-theme="bitcoin" class="body--dark">
-    <div id="satspoll-public" v-cloak></div>
+    <main class="shell q-pa-md" data-theme="bitcoin">
+      <header class="row items-center q-gutter-sm q-mb-lg">
+        <img class="app-icon" src="/ext-assets/satspoll/assets/icon.png" alt="" />
+        <div>
+          <h1 class="text-h5 text-weight-bold q-my-none">Sats Poll</h1>
+          <p class="text-caption text-grey-5 q-my-none">Lightning-powered voting</p>
+        </div>
+      </header>
+
+      <section class="panel q-card q-card--dark q-pa-md">
+        <div id="loading" class="text-grey-5">Loading poll...</div>
+        <div id="error" class="text-negative" role="alert" hidden></div>
+        <div id="poll" hidden>
+          <h2 id="poll-title" class="text-h4 text-weight-bold q-mt-none q-mb-sm"></h2>
+          <p id="poll-description" class="muted"></p>
+          <p id="poll-price" class="text-weight-medium"></p>
+          <div id="poll-options" class="poll-options"></div>
+          <button id="vote-button" class="q-btn bg-primary text-white full-width q-mt-md" type="button" disabled>
+            <span class="button-spinner" aria-hidden="true"></span>
+            <span class="button-label">Vote with Lightning</span>
+          </button>
+          <p id="closed-state" class="text-weight-medium q-mb-none" hidden>This poll is closed. Final results are shown above.</p>
+        </div>
+      </section>
+      <p class="text-caption text-grey-5 q-mt-md">Anonymous pay-to-vote poll. Payments do not enforce one person, one vote.</p>
+
+      <dialog id="invoice-dialog" class="invoice-dialog-card panel q-card q-card--dark q-pa-md" aria-labelledby="invoice-title">
+          <div class="row items-center justify-between q-mb-md">
+            <h2 id="invoice-title" class="text-h6 text-weight-bold q-my-none">Pay Invoice</h2>
+            <button class="invoice-close-button q-btn text-grey-5" type="button" data-close-invoice>Close</button>
+          </div>
+          <div id="invoice-qrcode" class="invoice-qrcode"></div>
+          <p id="invoice-status" class="invoice-status muted" aria-live="assertive">Waiting for payment</p>
+          <button id="copy-invoice" class="q-btn invoice-copy-button text-grey-2" type="button">Copy Invoice</button>
+      </dialog>
+
+      <template id="public-option-template">
+        <label class="public-option">
+          <span class="row items-center no-wrap q-gutter-sm">
+            <input type="radio" name="poll-option" />
+            <span class="option-label text-weight-medium"></span>
+            <span class="option-result text-caption text-grey-5"></span>
+          </span>
+          <span class="result-track"><span class="result-fill"></span></span>
+        </label>
+      </template>
+    </main>
     <script src="/ext-assets/satspoll/_lnbits/vue.global.prod.js"></script>
-    <script src="/ext-assets/satspoll/_lnbits/quasar.umd.prod.js"></script>
     <script src="/ext-assets/satspoll/_lnbits/qrcode.vue.browser.js"></script>
     <script src="/ext-assets/satspoll/lnbits-extension-sdk.js"></script>
     <script src="/ext-assets/satspoll/public.js"></script>

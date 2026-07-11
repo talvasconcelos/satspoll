@@ -9,9 +9,60 @@
     <link rel="stylesheet" href="/ext-assets/satspoll/app.css" />
   </head>
   <body data-theme="bitcoin" class="body--dark">
-    <div id="satspoll-admin" v-cloak></div>
-    <script src="/ext-assets/satspoll/_lnbits/vue.global.prod.js"></script>
-    <script src="/ext-assets/satspoll/_lnbits/quasar.umd.prod.js"></script>
+    <main class="shell q-pa-md">
+      <header class="row items-center justify-between q-mb-lg q-gutter-md">
+        <div class="row items-center q-gutter-sm">
+          <img class="app-icon" src="/ext-assets/satspoll/assets/icon.png" alt="" />
+          <div>
+            <h1 class="text-h5 text-weight-bold q-my-none">Sats Poll</h1>
+            <div class="text-caption text-grey-5">Lightning-powered voting</div>
+          </div>
+        </div>
+        <button id="open-create" class="q-btn bg-primary text-white" type="button">
+          <span class="material-icons q-mr-sm" aria-hidden="true">add</span>Create poll
+        </button>
+      </header>
+
+      <section class="panel q-card q-card--dark q-pa-md">
+        <div id="empty-state" class="text-grey-5">No polls yet.</div>
+        <div id="poll-list" class="poll-list"></div>
+      </section>
+
+      <dialog id="create-dialog" class="panel modal-card q-card q-card--dark q-pa-none" aria-labelledby="create-title">
+        <form id="create-form" class="form q-pa-lg q-gutter-md">
+          <div class="row items-center justify-between">
+            <h2 id="create-title" class="text-h6 q-my-none">Create poll</h2>
+            <button class="icon-button material-icons" type="button" aria-label="Close" data-close>close</button>
+          </div>
+          <label><span>Title *</span><input name="title" maxlength="100" required /></label>
+          <label><span>Description</span><textarea name="description" maxlength="500"></textarea></label>
+          <label><span>Receiving wallet *</span><select name="walletId" required></select></label>
+          <label><span>Sats per vote *</span><input name="amountSats" type="number" min="1" step="1" value="100" required /></label>
+          <div id="option-fields" class="q-gutter-y-sm"></div>
+          <button id="add-option" class="q-btn text-primary" type="button"><span class="material-icons q-mr-sm" aria-hidden="true">add</span>Add option</button>
+          <div class="row justify-end q-gutter-sm">
+            <button class="q-btn" type="button" data-close>Cancel</button>
+            <button id="create-poll" class="q-btn bg-primary text-white" type="submit">Create</button>
+          </div>
+        </form>
+      </dialog>
+
+      <template id="option-template">
+        <div class="option-field row items-center no-wrap q-gutter-sm">
+          <label class="col"><span></span><input maxlength="80" required /></label>
+          <button class="remove-option icon-button material-icons text-negative" type="button" aria-label="Remove option">remove_circle</button>
+        </div>
+      </template>
+      <template id="poll-template">
+        <article class="poll-row row items-center q-col-gutter-md">
+          <div class="col-12 col-md"><div class="poll-title text-weight-medium"></div><div class="poll-description text-caption text-grey-5"></div></div>
+          <div class="col-auto"><span class="poll-status q-badge"></span></div>
+          <div class="poll-amount col-auto"></div>
+          <div class="poll-votes col-auto"></div>
+          <div class="poll-actions col-auto row q-gutter-xs"></div>
+        </article>
+      </template>
+    </main>
     <script src="/ext-assets/satspoll/lnbits-extension-sdk.js"></script>
     <script src="/ext-assets/satspoll/admin.js"></script>
   </body>
