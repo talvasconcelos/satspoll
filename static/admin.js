@@ -21,6 +21,15 @@ const app = Vue.createApp({
   computed: {
     walletOptions() {
       return this.wallets.map(wallet => ({label: wallet.name, value: wallet.id}))
+    },
+    canCreate() {
+      return Boolean(
+        this.form.title.trim() &&
+        this.form.walletId &&
+        Number.isInteger(Number(this.form.amountSats)) &&
+        Number(this.form.amountSats) > 0 &&
+        this.form.options.every(option => option.trim())
+      )
     }
   },
   async mounted() {
@@ -165,7 +174,7 @@ const app = Vue.createApp({
         ])
       })),
       h(QDialog, {modelValue: this.dialog, 'onUpdate:modelValue': value => { this.dialog = value }, onHide: this.resetForm}, () =>
-        h(QCard, {class: 'dialog-card q-pa-lg'}, () => h(QForm, {class: 'q-gutter-md', onSubmit: this.create}, () => [
+        h(QCard, {class: 'dialog-card q-pa-lg'}, () => h(QForm, {class: 'q-gutter-md'}, () => [
           h('h2', {class: 'text-h6 q-my-none'}, 'Create poll'),
           field('title', {label: 'Title *', maxlength: 100, counter: true}),
           field('description', {type: 'textarea', label: 'Description', maxlength: 500, counter: true}),
@@ -173,7 +182,7 @@ const app = Vue.createApp({
           field('amountSats', {type: 'number', min: 1, step: 1, label: 'Sats per vote *'}),
           ...optionFields,
           this.form.options.length < 8 ? h(QBtn, {flat: true, icon: 'add', label: 'Add option', onClick: () => this.form.options.push('')}) : null,
-          h('div', {class: 'row justify-end q-gutter-sm'}, [h(QBtn, {flat: true, label: 'Cancel', onClick: () => { this.dialog = false }}), h(QBtn, {unelevated: true, color: 'primary', label: 'Create', type: 'submit', loading: this.saving})])
+          h('div', {class: 'row justify-end q-gutter-sm'}, [h(QBtn, {flat: true, label: 'Cancel', onClick: () => { this.dialog = false }}), h(QBtn, {unelevated: true, color: 'primary', label: 'Create', disable: !this.canCreate, loading: this.saving, onClick: this.create})])
         ]))
       )
     ])
