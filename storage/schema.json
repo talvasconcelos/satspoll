@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "tables": {
+    "polls": {"fields": [
+      {"name":"id","type":"string"}, {"name":"title","type":"string"},
+      {"name":"description","type":"string"}, {"name":"wallet_id","type":"string"},
+      {"name":"amount_sats","type":"integer"}, {"name":"status","type":"string"},
+      {"name":"created_at","type":"datetime"}, {"name":"updated_at","type":"datetime"}
+    ]},
+    "poll_options": {"fields": [
+      {"name":"id","type":"string"}, {"name":"poll_id","type":"string"},
+      {"name":"label","type":"string"}, {"name":"position","type":"integer"}
+    ]},
+    "votes": {"fields": [
+      {"name":"id","type":"string"}, {"name":"poll_id","type":"string"},
+      {"name":"option_id","type":"string"}, {"name":"payment_hash","type":"string"},
+      {"name":"amount_sats","type":"integer"}, {"name":"paid_at","type":"datetime"}
+    ]}
+  },
+  "indexes": [
+    {"table":"poll_options","name":"poll_options_by_poll","field":"poll_id"},
+    {"table":"votes","name":"votes_by_poll","field":"poll_id"},
+    {"table":"votes","name":"votes_by_payment_hash","field":"payment_hash"}
+  ]
+}

@@ -1,0 +1,60 @@
+{
+  "id": "satspoll",
+  "name": "Sats Poll",
+  "short_description": "Create public polls where each Lightning payment counts as a vote.",
+  "version": "0.1.0",
+  "min_lnbits_version": "1.5.5",
+  "extension_type": "wasm",
+  "wasm": {
+    "module": "wasm/module.wasm",
+    "exports": [
+      {"name": "create-poll", "visibility": "authenticated"},
+      {"name": "list-polls", "visibility": "authenticated"},
+      {"name": "get-poll", "visibility": "authenticated"},
+      {"name": "update-poll", "visibility": "authenticated"},
+      {"name": "delete-poll", "visibility": "authenticated"},
+      {"name": "list-wallets", "visibility": "authenticated"},
+      {"name": "get-public-poll", "visibility": "public"},
+      {"name": "create-vote-invoice", "visibility": "public"},
+      {"name": "record-vote", "visibility": "event"}
+    ]
+  },
+  "events": {"onInvoicePaid": "record-vote"},
+  "ui_routes": [
+    {"path": "/satspoll", "entrypoint": "ui/admin.html", "auth": "user"},
+    {
+      "path": "/satspoll/{poll_id}",
+      "entrypoint": "ui/public.html",
+      "auth": "public",
+      "path_params": {"poll_id": "pollId"}
+    }
+  ],
+  "api_routes": [
+    {"method": "POST", "path": "/polls", "export": "create-poll", "auth": "user"},
+    {"method": "GET", "path": "/polls", "export": "list-polls", "auth": "user"},
+    {"method": "GET", "path": "/polls/{poll_id}", "export": "get-poll", "auth": "user", "path_params": {"poll_id": "pollId"}},
+    {"method": "PATCH", "path": "/polls/{poll_id}", "export": "update-poll", "auth": "user", "path_params": {"poll_id": "pollId"}},
+    {"method": "DELETE", "path": "/polls/{poll_id}", "export": "delete-poll", "auth": "user", "path_params": {"poll_id": "pollId"}},
+    {"method": "GET", "path": "/wallets", "export": "list-wallets", "auth": "user"},
+    {"method": "GET", "path": "/polls/{poll_id}/public", "export": "get-public-poll", "auth": "public", "path_params": {"poll_id": "pollId"}},
+    {"method": "POST", "path": "/polls/{poll_id}/invoice", "export": "create-vote-invoice", "auth": "public", "path_params": {"poll_id": "pollId"}}
+  ],
+  "permissions": [
+    {"id": "ext.storage.read", "description": "Read polls, options, and paid votes."},
+    {"id": "ext.storage.write", "description": "Create polls and record paid votes."},
+    {
+      "id": "ext.storage.read_public",
+      "description": "Read public poll and option fields.",
+      "policies": [
+        {"table_name": "polls", "public_fields": ["id", "title", "description", "amount_sats", "status"]},
+        {"table_name": "poll_options", "public_fields": ["id", "poll_id", "label", "position"]}
+      ]
+    },
+    {"id": "wallet.list", "description": "Choose a receiving wallet."},
+    {
+      "id": "wallet.create_invoice_public",
+      "description": "Create vote invoices for a poll's receiving wallet.",
+      "policies": [{"table": "polls", "wallet_field": "wallet_id"}]
+    }
+  ]
+}
