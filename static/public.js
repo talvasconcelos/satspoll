@@ -11,13 +11,17 @@ const optionsNode = document.querySelector("#poll-options");
 const voteButton = document.querySelector("#vote-button");
 const invoiceDialog = document.querySelector("#invoice-dialog");
 const invoiceStatus = document.querySelector("#invoice-status");
+const invoiceLink = document.querySelector("#invoice-link");
 const copyInvoice = document.querySelector("#copy-invoice");
 
 voteButton.addEventListener("click", createInvoice);
-copyInvoice.addEventListener("click", () => {
-  navigator.clipboard
-    ?.writeText(state.invoice?.paymentRequest || "")
-    .catch(showError);
+copyInvoice.addEventListener("click", async () => {
+  try {
+    await navigator.clipboard.writeText(state.invoice?.paymentRequest || "");
+    client.notify("Invoice copied.", "positive").catch(() => {});
+  } catch (error) {
+    showError(error);
+  }
 });
 document
   .querySelectorAll("[data-close-invoice]")
@@ -78,7 +82,7 @@ async function createInvoice() {
     }
     state.invoice = invoice;
     invoiceStatus.textContent = "Waiting for payment";
-    invoiceStatus.classList.remove("text-positive");
+    invoiceLink.href = `lightning:${state.invoice.paymentRequest}`;
     renderQrCode(state.invoice.paymentRequest);
     invoiceDialog.hidden = false;
     state.unsubscribe = await client.subscribePayment(
@@ -93,6 +97,7 @@ async function createInvoice() {
           paymentReceived();
       },
     );
+    client.notify("Waiting for payment.", "info").catch(() => {});
   } catch (error) {
     showError(error);
   } finally {
@@ -122,10 +127,8 @@ function renderQrCode(invoice) {
 }
 
 function paymentReceived() {
-  state.unsubscribe?.();
-  state.unsubscribe = null;
-  invoiceStatus.textContent = "Payment received. Vote counted.";
-  invoiceStatus.classList.add("text-positive");
+  closeInvoiceDialog();
+  client.notify("Payment received. Vote counted.", "positive").catch(() => {});
   window.setTimeout(() => loadPoll().catch(showError), 1600);
 }
 

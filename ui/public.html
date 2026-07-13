@@ -71,20 +71,19 @@
           aria-label="Close invoice"
           data-close-invoice
         ></button>
-        <section class="invoice-dialog-card panel q-card q-card--dark q-pa-md">
-          <div class="row items-center justify-between q-mb-md">
+        <section class="invoice-dialog-card panel q-card q-card--dark q-pa-lg">
+          <div class="row items-center justify-center q-mb-md">
             <h2 id="invoice-title" class="text-h6 text-weight-bold q-my-none">
               Pay Invoice
             </h2>
-            <button
-              class="invoice-close-button q-btn text-grey-5"
-              type="button"
-              data-close-invoice
-            >
-              Close
-            </button>
           </div>
-          <div id="invoice-qrcode" class="invoice-qrcode"></div>
+          <a
+            id="invoice-link"
+            class="invoice-link no-link"
+            aria-label="Open invoice in a Lightning wallet"
+          >
+            <div id="invoice-qrcode" class="invoice-qrcode"></div>
+          </a>
           <p
             id="invoice-status"
             class="invoice-status muted"
@@ -92,13 +91,22 @@
           >
             Waiting for payment
           </p>
-          <button
-            id="copy-invoice"
-            class="q-btn invoice-copy-button text-grey-2"
-            type="button"
-          >
-            Copy Invoice
-          </button>
+          <div class="invoice-actions row items-center justify-end q-gutter-sm">
+            <button
+              class="q-btn bg-transparent text-grey-5"
+              type="button"
+              data-close-invoice
+            >
+              Close
+            </button>
+            <button
+              id="copy-invoice"
+              class="q-btn invoice-copy-button bg-transparent text-primary"
+              type="button"
+            >
+              Copy Invoice
+            </button>
+          </div>
         </section>
       </div>
 

@@ -11,6 +11,14 @@
         return bridgeRequest({action: 'context'})
       },
 
+      notify(message, level = 'info') {
+        return bridgeRequest({
+          action: 'ui.notify',
+          level,
+          message: errorMessage(message)
+        })
+      },
+
       notifyError(message) {
         return bridgeRequest({
           action: 'ui.notify',

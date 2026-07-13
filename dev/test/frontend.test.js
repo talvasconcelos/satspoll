@@ -37,6 +37,7 @@ test("admin mounts without compilation and creates through a validated button", 
     listWallets: () =>
       Promise.resolve({ wallets: [{ id: "wallet-1", name: "Main wallet" }] }),
     notifyError: () => Promise.resolve(),
+    notify: () => Promise.resolve(),
     updatePoll: () => Promise.resolve(),
     deletePoll: () => Promise.resolve(),
   };
@@ -169,8 +170,14 @@ test("public payment page uses the CSP-safe Tips dialog pattern", async () => {
   );
   assert.match(html, /id="invoice-dialog"[^>]+hidden/);
   assert.match(html, /class="modal-backdrop"[^>]+data-close-invoice/);
+  assert.match(html, /id="invoice-link"/);
+  assert.match(html, /class="invoice-actions/);
   assert.match(source, /Invalid invoice response\./);
   assert.match(source, /QR code renderer is not available\./);
+  assert.match(source, /invoiceLink\.href = `lightning:/);
+  assert.match(source, /function paymentReceived\(\) \{\s+closeInvoiceDialog\(\);/);
+  assert.match(source, /Payment received\. Vote counted\./);
+  assert.match(source, /Waiting for payment\./);
   assert.match(source, /setTimeout\(\(\) => loadPoll\(\)/);
   assert.doesNotMatch(source, /showModal\(|\.close\(\)|template:/);
 });

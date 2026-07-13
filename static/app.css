@@ -139,6 +139,10 @@ button:disabled {
   border-radius: 4px;
   background: white;
 }
+.invoice-link {
+  display: block;
+  cursor: pointer;
+}
 .invoice-qrcode svg {
   display: block;
   width: min(100%, 280px);
@@ -148,9 +152,8 @@ button:disabled {
   margin: 14px 0;
   text-align: center;
 }
-.invoice-copy-button {
-  width: 100%;
-  background: rgba(255, 255, 255, 0.08);
+.invoice-actions {
+  margin-top: 16px;
 }
 .button-spinner {
   display: none;

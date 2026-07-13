@@ -89,6 +89,7 @@ const app = Vue.createApp({
         });
         this.closeCreateDialog();
         await this.fetchPolls();
+        client.notify("Poll created.", "positive").catch(() => {});
       } catch (error) {
         this.showError(error);
       } finally {
@@ -102,6 +103,12 @@ const app = Vue.createApp({
           status: poll.status === "open" ? "closed" : "open",
         });
         await this.fetchPolls();
+        client
+          .notify(
+            poll.status === "open" ? "Poll closed." : "Poll reopened.",
+            "positive",
+          )
+          .catch(() => {});
       } catch (error) {
         this.showError(error);
       }
@@ -116,6 +123,7 @@ const app = Vue.createApp({
         try {
           await client.deletePoll(poll.id);
           await this.fetchPolls();
+          client.notify("Poll deleted.", "positive").catch(() => {});
         } catch (error) {
           this.showError(error);
         }
@@ -129,10 +137,7 @@ const app = Vue.createApp({
     async copyPublicUrl(id) {
       try {
         await navigator.clipboard.writeText(this.publicUrl(id));
-        Quasar.Notify.create({
-          type: "positive",
-          message: "Public link copied.",
-        });
+        client.notify("Public link copied.", "positive").catch(() => {});
       } catch (error) {
         this.showError(error);
       }
