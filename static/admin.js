@@ -21,6 +21,28 @@ const app = Vue.createApp({
     await Promise.all([this.fetchWallets(), this.fetchPolls()]);
   },
 
+  computed: {
+    canCreatePoll() {
+      const title = this.form.title.trim();
+      const description = this.form.description.trim();
+      const amount = Number(this.form.amountSats);
+      const options = this.form.options.map((option) => option.trim());
+      return (
+        title.length > 0 &&
+        title.length <= 100 &&
+        description.length <= 500 &&
+        !!this.form.walletId &&
+        Number.isSafeInteger(amount) &&
+        amount > 0 &&
+        options.length >= 2 &&
+        options.length <= 8 &&
+        options.every((option) => option.length > 0 && option.length <= 80) &&
+        new Set(options.map((option) => option.toLowerCase())).size ===
+          options.length
+      );
+    },
+  },
+
   methods: {
     async fetchWallets() {
       try {
@@ -55,6 +77,7 @@ const app = Vue.createApp({
     },
 
     async createPoll() {
+      if (!this.canCreatePoll || this.creating) return;
       this.creating = true;
       try {
         await client.createPoll({
@@ -231,6 +254,12 @@ const app = Vue.createApp({
             maxlength: 80,
             rules: [
               (value) => !!String(value || "").trim() || "Option is required.",
+              (value) =>
+                this.form.options.filter(
+                  (option) =>
+                    option.trim().toLowerCase() ===
+                    String(value || "").trim().toLowerCase(),
+                ).length === 1 || "Options must be unique.",
             ],
             class: "col",
           }),
@@ -308,7 +337,6 @@ const app = Vue.createApp({
                     QForm,
                     {
                       class: "q-pa-lg q-gutter-md",
-                      onSubmit: this.createPoll,
                     },
                     {
                       default: () => [
@@ -394,9 +422,10 @@ const app = Vue.createApp({
                           h(QBtn, {
                             color: "primary",
                             label: "Create",
-                            type: "submit",
+                            type: "button",
                             loading: this.creating,
-                            disable: !this.wallets.length,
+                            disable: !this.canCreatePoll,
+                            onClick: this.createPoll,
                           }),
                         ]),
                       ],

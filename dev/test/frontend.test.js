@@ -15,7 +15,7 @@ function walk(node, visit) {
   }
 }
 
-test("admin mounts without runtime compilation and submits through QForm", async () => {
+test("admin mounts without compilation and creates through a validated button", async () => {
   const html = await readFile(
     new URL("../../ui/admin.html", import.meta.url),
     "utf8",
@@ -59,6 +59,11 @@ test("admin mounts without runtime compilation and submits through QForm", async
           for (const [name, method] of Object.entries(options.methods)) {
             instance[name] = method.bind(instance);
           }
+          for (const [name, computed] of Object.entries(options.computed)) {
+            Object.defineProperty(instance, name, {
+              get: computed.bind(instance),
+            });
+          }
           instance.render = options.render.bind(instance);
           return instance;
         },
@@ -97,17 +102,50 @@ test("admin mounts without runtime compilation and submits through QForm", async
 
   await options.mounted.call(instance);
   instance.createDialog = true;
-  instance.form.title = "Lunch?";
-  instance.form.options = ["Pizza", "Soup"];
 
-  const nodes = [];
+  let nodes = [];
   walk(instance.render(), (node) => nodes.push(node));
   assert.ok(nodes.some((node) => node.type === "q-dialog"));
   assert.ok(nodes.some((node) => node.type === "q-input"));
   assert.ok(nodes.some((node) => node.type === "q-select"));
-  const form = nodes.find((node) => node.type === "q-form");
-  assert.ok(form, "QForm must own poll submission");
-  await form.props.onSubmit();
+  assert.ok(nodes.some((node) => node.type === "q-form"));
+  let createButton = nodes.find(
+    (node) => node.type === "q-btn" && node.props.label === "Create",
+  );
+  assert.equal(createButton.props.disable, true);
+
+  instance.form.title = "Lunch?";
+  instance.form.options = ["Pizza", "pizza"];
+  nodes = [];
+  walk(instance.render(), (node) => nodes.push(node));
+  createButton = nodes.find(
+    (node) => node.type === "q-btn" && node.props.label === "Create",
+  );
+  assert.equal(createButton.props.disable, true);
+
+  instance.form.options = ["Pizza", "Soup"];
+  assert.equal(instance.canCreatePoll, true);
+  instance.form.walletId = "";
+  assert.equal(instance.canCreatePoll, false);
+  instance.form.walletId = "wallet-1";
+  instance.form.amountSats = 1.5;
+  assert.equal(instance.canCreatePoll, false);
+  instance.form.amountSats = 100;
+  instance.form.options = ["Only one"];
+  assert.equal(instance.canCreatePoll, false);
+  instance.form.options = Array.from({ length: 9 }, (_, index) => String(index));
+  assert.equal(instance.canCreatePoll, false);
+  instance.form.options = ["Pizza", "Soup"];
+
+  nodes = [];
+  walk(instance.render(), (node) => nodes.push(node));
+  createButton = nodes.find(
+    (node) => node.type === "q-btn" && node.props.label === "Create",
+  );
+  assert.equal(createButton.props.disable, false);
+  assert.equal(createButton.props.type, "button");
+  assert.equal(typeof createButton.props.onClick, "function");
+  await createButton.props.onClick();
 
   assert.deepEqual(created, [
     {
