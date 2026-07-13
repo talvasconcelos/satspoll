@@ -20,10 +20,10 @@ async function moduleWithHost() {
       return Object.fromEntries(fields.map(field => [field, row[field]]))
     },
     getPaginated(table, {filters = {}, limit = 1000} = {}) {
-      const data = tables[table].filter(row =>
+      const matches = tables[table].filter(row =>
         Object.entries(filters).every(([key, value]) => row[key] === value)
-      ).slice(0, limit)
-      return {data, total: data.length}
+      )
+      return {data: matches.slice(0, limit), total: matches.length}
     },
     delete(table, id) { tables[table] = tables[table].filter(row => row.id !== id) }
   }
@@ -53,6 +53,7 @@ test('validates options and counts a paid event once', async () => {
   const optionId = poll.options[0].id
   const event = {paymentHash: 'paid_hash', sourceId: poll.id, amount: 21000, extra: {extra_satspoll: {optionId}}}
   assert.equal(unwrap(api.recordVote(JSON.stringify(event))).data.recorded, true)
+  tables.poll_options.find(row => row.id === optionId).count = 0
   assert.equal(unwrap(api.recordVote(JSON.stringify(event))).data.duplicate, true)
   assert.equal(tables.votes.length, 1)
   const publicPoll = unwrap(api.getPublicPoll(JSON.stringify({pollId: poll.id}))).data
@@ -73,4 +74,15 @@ test('invoice rejects closed, unknown, and foreign options without a vote', asyn
   tables.polls.find(row => row.id === first.id).status = 'closed'
   assert.equal(invoice({pollId: first.id, optionId: first.options[0].id}).ok, false)
   assert.equal(tables.votes.length, 0)
+})
+
+test('rejects too many options', async () => {
+  const {api} = await moduleWithHost()
+  const response = unwrap(api.createPoll(JSON.stringify({
+    title: 'Poll',
+    walletId: 'wallet',
+    amountSats: 1,
+    options: Array.from({length: 9}, (_, index) => String(index))
+  })))
+  assert.equal(response.ok, false)
 })

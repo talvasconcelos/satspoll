@@ -52,11 +52,15 @@ async function createInvoice() {
   voteButton.disabled = true
   voteButton.setAttribute('aria-busy', 'true')
   try {
-    state.invoice = await client.createInvoice(state.pollId, {optionId: state.selected})
+    const invoice = await client.createInvoice(state.pollId, {optionId: state.selected})
+    if (!invoice?.paymentRequest || !invoice?.paymentHash) {
+      throw new Error('Invalid invoice response.')
+    }
+    state.invoice = invoice
     invoiceStatus.textContent = 'Waiting for payment'
     invoiceStatus.classList.remove('text-positive')
     renderQrCode(state.invoice.paymentRequest)
-    invoiceDialog.showModal()
+    invoiceDialog.hidden = false
     state.unsubscribe = await client.subscribePayment(state.invoice.paymentHash, event => {
       const payment = event.data || {}
       if (event.event === 'payment.settled' || payment.pending === false || ['paid', 'settled', 'success'].includes(String(payment.status || ''))) paymentReceived()
@@ -79,12 +83,12 @@ function renderQrCode(invoice) {
   state.qrApp.mount(node)
 }
 
-async function paymentReceived() {
+function paymentReceived() {
   state.unsubscribe?.()
   state.unsubscribe = null
   invoiceStatus.textContent = 'Payment received. Vote counted.'
   invoiceStatus.classList.add('text-positive')
-  await loadPoll()
+  window.setTimeout(() => loadPoll().catch(showError), 1600)
 }
 
 function closeInvoiceDialog() {
@@ -92,7 +96,7 @@ function closeInvoiceDialog() {
   state.unsubscribe = null
   state.qrApp?.unmount()
   state.qrApp = null
-  invoiceDialog.close()
+  invoiceDialog.hidden = true
 }
 
 function showError(error) {

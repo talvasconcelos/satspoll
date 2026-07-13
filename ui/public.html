@@ -35,7 +35,8 @@
       </section>
       <p class="text-caption text-grey-5 q-mt-md">Anonymous pay-to-vote poll. Payments do not enforce one person, one vote.</p>
 
-      <dialog id="invoice-dialog" class="invoice-dialog-card panel q-card q-card--dark q-pa-md" aria-labelledby="invoice-title">
+      <div id="invoice-dialog" class="modal" role="dialog" aria-modal="true" aria-labelledby="invoice-title" hidden>
+        <section class="invoice-dialog-card panel q-card q-card--dark q-pa-md">
           <div class="row items-center justify-between q-mb-md">
             <h2 id="invoice-title" class="text-h6 text-weight-bold q-my-none">Pay Invoice</h2>
             <button class="invoice-close-button q-btn text-grey-5" type="button" data-close-invoice>Close</button>
@@ -43,7 +44,8 @@
           <div id="invoice-qrcode" class="invoice-qrcode"></div>
           <p id="invoice-status" class="invoice-status muted" aria-live="assertive">Waiting for payment</p>
           <button id="copy-invoice" class="q-btn invoice-copy-button text-grey-2" type="button">Copy Invoice</button>
-      </dialog>
+        </section>
+      </div>
 
       <template id="public-option-template">
         <label class="public-option">

@@ -118,7 +118,9 @@ export function recordVote(eventJson) {
     const extra = extensionExtra(event)
     const optionId = cleanText(extra.optionId || extra.option_id, 128)
     if (!paymentHash || !pollId || !optionId) return {recorded: false}
-    if (rows(VOTES, {payment_hash: paymentHash}, 1).length) {
+    const existingVote = rows(VOTES, {payment_hash: paymentHash}, 1)[0]
+    if (existingVote) {
+      syncOptionCount(storage.get(OPTIONS, existingVote.option_id))
       return {recorded: false, duplicate: true}
     }
     const poll = getPollRow(pollId)
@@ -133,10 +135,19 @@ export function recordVote(eventJson) {
       paid_at: eventTimestamp(event)
     }
     storage.set(VOTES, vote)
-    // ponytail: public reads cannot aggregate; votes remain authoritative if atomic counters become available.
-    storage.set(OPTIONS, {...option, count: Number(option.count || 0) + 1})
+    syncOptionCount(option)
     return {recorded: true, voteId: vote.id}
   })
+}
+
+function syncOptionCount(option) {
+  if (!option) return
+  // ponytail: public reads cannot aggregate; remove this projection when public aggregate reads exist.
+  const count = storage.getPaginated(VOTES, {
+    filters: {option_id: option.id},
+    limit: 1
+  }).total
+  storage.set(OPTIONS, {...option, count})
 }
 
 function pollDetail(poll) {
@@ -225,7 +236,7 @@ function validateOptions(value) {
   const labels = value.map(option =>
     requiredText(typeof option === 'string' ? option : option?.label, 'option', 80)
   )
-  if (new Set(labels.map(label => label.toLocaleLowerCase())).size !== labels.length) {
+  if (new Set(labels.map(label => label.toLowerCase())).size !== labels.length) {
     throw new Error('Option labels must be unique.')
   }
   return labels

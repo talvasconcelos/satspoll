@@ -17,8 +17,11 @@ body { margin: 0; min-height: 100vh; background: var(--q-dark-page); color: whit
 button.q-btn { min-height: 40px; border: 0; border-radius: 4px; cursor: pointer; font: inherit; padding: 8px 16px; }
 button:disabled { cursor: not-allowed; opacity: 0.6; }
 .icon-button { border: 0; background: transparent; color: inherit; cursor: pointer; }
+.modal {
+  position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center;
+  padding: 16px; overflow: auto; background: rgba(0, 0, 0, 0.66);
+}
 .modal-card { width: min(560px, calc(100vw - 32px)); max-height: 90vh; overflow: auto; }
-dialog::backdrop { background: rgba(0, 0, 0, 0.66); }
 .poll-row { padding: 12px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.14); }
 .poll-row:last-child { border-bottom: 0; }
 .poll-options { display: grid; gap: 10px; }
@@ -26,7 +29,7 @@ dialog::backdrop { background: rgba(0, 0, 0, 0.66); }
 .option-result { margin-left: auto; }
 .result-track { height: 8px; overflow: hidden; border-radius: 4px; background: rgba(255, 255, 255, 0.12); }
 .result-fill { display: block; height: 100%; background: var(--q-primary); }
-.invoice-dialog-card { width: min(420px, calc(100vw - 32px)); }
+.invoice-dialog-card { width: min(420px, calc(100vw - 32px)); max-height: 90vh; overflow: auto; }
 .invoice-qrcode { display: grid; min-height: 300px; place-items: center; padding: 10px; border-radius: 4px; background: white; }
 .invoice-qrcode svg { display: block; width: min(100%, 280px); height: auto; }
 .invoice-status { margin: 14px 0; text-align: center; }
