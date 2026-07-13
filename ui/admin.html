@@ -5,77 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Sats Poll</title>
     <link rel="stylesheet" href="/ext-assets/satspoll/_lnbits/bundle.min.css" />
-    <link rel="stylesheet" href="/ext-assets/satspoll/_lnbits/material-icons.css" />
+    <link
+      rel="stylesheet"
+      href="/ext-assets/satspoll/_lnbits/material-icons.css"
+    />
     <link rel="stylesheet" href="/ext-assets/satspoll/app.css" />
   </head>
   <body data-theme="bitcoin" class="body--dark">
-    <main id="satspoll-admin-app" class="shell q-pa-md" v-cloak>
-      <header class="row items-center justify-between q-mb-lg q-gutter-md">
-        <div class="row items-center q-gutter-sm">
-          <img class="app-icon" src="/ext-assets/satspoll/assets/icon.png" alt="" />
-          <div>
-            <h1 class="text-h5 text-weight-bold q-my-none">Sats Poll</h1>
-            <div class="text-caption text-grey-5">Lightning-powered voting</div>
-          </div>
-        </div>
-        <q-btn color="primary" icon="add" label="Create poll" @click="openCreateDialog"></q-btn>
-      </header>
-
-      <section class="panel q-card q-card--dark q-pa-md">
-        <div v-if="!polls.length" class="text-grey-5">No polls yet.</div>
-        <article v-for="poll in polls" :key="poll.id" class="poll-row row items-center q-col-gutter-md">
-          <div class="col-12 col-md">
-            <div class="text-weight-medium" v-text="poll.title"></div>
-            <div class="text-caption text-grey-5" v-text="poll.description || 'No description.'"></div>
-          </div>
-          <div class="col-auto">
-            <q-badge :color="poll.status === 'open' ? 'positive' : 'grey-7'" :label="poll.status"></q-badge>
-          </div>
-          <div class="col-auto" v-text="`${poll.amountSats} sats / vote`"></div>
-          <div class="col-auto" v-text="`${poll.totalVotes} votes`"></div>
-          <div class="col-auto row q-gutter-xs">
-            <q-btn flat round icon="link" aria-label="Open public poll" @click="openPublicPoll(poll.id)"></q-btn>
-            <q-btn flat round icon="content_copy" aria-label="Copy public link" @click="copyPublicUrl(poll.id)"></q-btn>
-            <q-btn flat round :icon="poll.status === 'open' ? 'lock' : 'lock_open'" :aria-label="poll.status === 'open' ? 'Close poll' : 'Reopen poll'" @click="togglePoll(poll)"></q-btn>
-            <q-btn flat round icon="delete" color="negative" aria-label="Delete poll" :disable="poll.totalVotes > 0" @click="deletePoll(poll)"></q-btn>
-          </div>
-        </article>
-      </section>
-
-      <q-dialog v-model="createDialog" persistent>
-        <q-card class="modal-card q-card--dark">
-          <form class="form q-pa-lg q-gutter-md" @submit.prevent="createPoll">
-            <div class="row items-center justify-between">
-              <h2 class="text-h6 q-my-none">Create poll</h2>
-              <q-btn flat round icon="close" aria-label="Close" type="button" @click="closeCreateDialog"></q-btn>
-            </div>
-            <label><span>Title *</span><input v-model="form.title" maxlength="100" required /></label>
-            <label><span>Description</span><textarea v-model="form.description" maxlength="500"></textarea></label>
-            <label>
-              <span>Receiving wallet *</span>
-              <select v-model="form.walletId" required>
-                <option v-for="wallet in wallets" :key="wallet.id" :value="wallet.id" v-text="wallet.name"></option>
-              </select>
-            </label>
-            <label><span>Sats per vote *</span><input v-model.number="form.amountSats" type="number" min="1" step="1" required /></label>
-            <div class="q-gutter-y-sm">
-              <div v-for="(_, index) in form.options" :key="index" class="option-field row items-center no-wrap q-gutter-sm">
-                <label class="col">
-                  <span v-text="`Option ${index + 1} *`"></span>
-                  <input v-model="form.options[index]" maxlength="80" required />
-                </label>
-                <q-btn v-if="form.options.length > 2" flat round icon="remove_circle" color="negative" aria-label="Remove option" type="button" @click="removeOption(index)"></q-btn>
-              </div>
-            </div>
-            <q-btn v-if="form.options.length < 8" flat color="primary" icon="add" label="Add option" type="button" @click="addOption"></q-btn>
-            <div class="row justify-end q-gutter-sm">
-              <q-btn flat label="Cancel" type="button" @click="closeCreateDialog"></q-btn>
-              <q-btn color="primary" label="Create" type="submit" :loading="creating" :disable="!wallets.length"></q-btn>
-            </div>
-          </form>
-        </q-card>
-      </q-dialog>
-    </main>
+    <div id="satspoll-admin-app" v-cloak></div>
     <script src="/ext-assets/satspoll/_lnbits/vue.global.prod.js"></script>
     <script src="/ext-assets/satspoll/_lnbits/quasar.umd.prod.js"></script>
     <script src="/ext-assets/satspoll/lnbits-extension-sdk.js"></script>
